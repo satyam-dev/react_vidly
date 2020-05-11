@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { getMovies } from "../services/fakeMovieService";
-import Like from "./common/like";
 import { cloneDeep, findIndex } from "lodash";
 import Pagination from "./common/pagination";
 import { paginate } from "../utils/paginate";
