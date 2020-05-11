@@ -7,6 +7,7 @@ import { paginate } from "../utils/paginate";
 import PropTypes from "prop-types";
 import ListGroup from "./common/listGroup";
 import { getGenres } from "../services/fakeGenreService";
+import MoviesTable from "./moviesTable";
 class Movies extends Component {
   state = {
     movies: [],
@@ -19,17 +20,17 @@ class Movies extends Component {
     const genres = [{ name: "All Genres", _id: "all_genres" }, ...getGenres()];
     this.setState({ movies: getMovies(), genres });
   }
-  handleDelete(movie) {
+  handleDelete = (movie) => {
     const movies = this.state.movies.filter((m) => m._id !== movie._id);
     this.setState({ movies });
-  }
-  handleLike(movie) {
+  };
+  handleLike = (movie) => {
     const movies = cloneDeep(this.state.movies);
     const index = findIndex(movies, movie);
     movies[index] = cloneDeep(movies[index]); // doubt
     movies[index].liked = !movies[index].liked;
     this.setState({ movies });
-  }
+  };
   handlePageChange = (page) => {
     this.setState({ currentPage: page });
   };
@@ -64,39 +65,11 @@ class Movies extends Component {
         </div>
         <div className="col">
           <p>Showing {filteredMovies.length} movies in the database</p>
-          <table className="table">
-            <thead>
-              <tr>
-                <th className="th">Title</th>
-                <th className="th">Genre</th>
-                <th className="th">Stock</th>
-                <th className="th">Rate</th>
-                <th className="th"></th>
-                <th className="th"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {movies.map((m) => (
-                <tr key={m._id}>
-                  <td className="td">{m.title}</td>
-                  <td className="td">{m.genre.name}</td>
-                  <td className="td">{m.numberInStock}</td>
-                  <td className="td">{m.dailyRentalRate}</td>
-                  <td className="td">
-                    <Like liked={m.liked} onClick={() => this.handleLike(m)} />
-                  </td>
-                  <td className="td">
-                    <button
-                      onClick={() => this.handleDelete(m)}
-                      className="btn btn-danger btn-sm"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <MoviesTable
+            movies={movies}
+            onDelete={this.handleDelete}
+            onLike={this.handleLike}
+          />
           <Pagination
             itemsCount={filteredMovies.length}
             pageSize={pageSize}
