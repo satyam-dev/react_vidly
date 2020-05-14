@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import ListGroup from "./common/listGroup";
 import { getGenres } from "../services/fakeGenreService";
 import MoviesTable from "./moviesTable";
+import _ from "lodash";
 class Movies extends Component {
   state = {
     movies: [],
@@ -14,6 +15,7 @@ class Movies extends Component {
     pageSize: 4,
     currentPage: 1,
     selectedGenre: null,
+    sortColumn: { path: "title", order: "asc" },
   };
   componentDidMount() {
     const genres = [{ name: "All Genres", _id: "all_genres" }, ...getGenres()];
@@ -36,23 +38,44 @@ class Movies extends Component {
   handleItemSelect = (item) => {
     this.setState({ selectedGenre: item, currentPage: 1 });
   };
+  handleSort = (sortColumn) => {
+    this.setState({ sortColumn });
+  };
+  getPagedData = () => {
+    const {
+      currentPage,
+      pageSize,
+      movies: allMovies,
+      selectedGenre,
+      sortColumn,
+    } = this.state;
+    const filteredMovies =
+      selectedGenre && selectedGenre._id !== "all_genres"
+        ? allMovies.filter((m) => m.genre._id === selectedGenre._id)
+        : allMovies;
+    const sortedMovies = _.orderBy(
+      filteredMovies,
+      [sortColumn.path],
+      sortColumn.order
+    );
+    const movies = paginate(sortedMovies, currentPage, pageSize);
+
+    return { movies, totalCount: filteredMovies.length };
+  };
   render() {
     const { length: count } = this.state.movies;
     const {
       currentPage,
       pageSize,
-      movies: allMovies,
       genres,
       selectedGenre,
+      sortColumn,
     } = this.state;
     if (count === 0) {
       return <p>There are no movies in the database</p>;
     }
-    const filteredMovies =
-      selectedGenre && selectedGenre._id !== "all_genres"
-        ? allMovies.filter((m) => m.genre._id === selectedGenre._id)
-        : allMovies;
-    const movies = paginate(filteredMovies, currentPage, pageSize);
+    const { movies, totalCount } = this.getPagedData();
+
     return (
       <div className="row">
         <div className="col-3">
@@ -63,14 +86,16 @@ class Movies extends Component {
           />
         </div>
         <div className="col">
-          <p>Showing {filteredMovies.length} movies in the database</p>
+          <p>Showing {totalCount} movies in the database</p>
           <MoviesTable
+            sortColumn={sortColumn}
             movies={movies}
             onDelete={this.handleDelete}
             onLike={this.handleLike}
+            onSort={this.handleSort}
           />
           <Pagination
-            itemsCount={filteredMovies.length}
+            itemsCount={totalCount}
             pageSize={pageSize}
             currentPage={currentPage}
             onPageChange={this.handlePageChange}
