@@ -106,6 +106,7 @@ class Movies extends Component {
             placeholder="Search for movies..."
             value={this.state.searchQuery}
             onChange={this.handleSearch}
+            style={{ maxWidth: "400px" }}
           />
           <MoviesTable
             sortColumn={sortColumn}
