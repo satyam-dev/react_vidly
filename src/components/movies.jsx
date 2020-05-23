@@ -8,6 +8,7 @@ import ListGroup from "./common/listGroup";
 import { getGenres } from "../services/fakeGenreService";
 import MoviesTable from "./moviesTable";
 import _ from "lodash";
+import { Link } from "react-router-dom";
 class Movies extends Component {
   state = {
     movies: [],
@@ -87,6 +88,9 @@ class Movies extends Component {
         </div>
         <div className="col">
           <p>Showing {totalCount} movies in the database</p>
+          <Link to="/movies/new" className="btn btn-primary mb-2">
+            New Movie
+          </Link>
           <MoviesTable
             sortColumn={sortColumn}
             movies={movies}
