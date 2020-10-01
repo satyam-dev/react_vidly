@@ -13,7 +13,6 @@ class LoginForm extends Form {
   };
 
   doSubmit = (e) => {
-    //submit
     console.log("Submitted");
     // Call database request
   };
